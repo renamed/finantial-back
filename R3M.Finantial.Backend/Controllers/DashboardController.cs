@@ -23,21 +23,7 @@ public class DashboardController : ControllerBase
     [HttpGet("categories/{periodId}")]
     public async Task<IActionResult> GroupByCategoryAsync(Guid periodId, [FromQuery] Guid? parentId = null)
     {
-        var statistics = await finantialContext.Movimentations
-            .Include(i => i.Category)
-            .ThenInclude(i => i.Children)
-            .Where(x => x.PeriodId == periodId)
-            .GroupBy(x => x.Category.Name)
-            .Select(x => new GroupByCategoryResponse
-            {
-                Category = x.First().Category.Name,
-                Sum = x.Sum(s => s.Value),
-                Qty = x.Count(),
-                Avg = x.Average(s => s.Value)
-            })
-            .ToListAsync();
-
-        return Ok(statistics);
+        return NoContent();
     }
 
 }

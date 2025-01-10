@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Npgsql;
 using R3M.Finantial.Backend.Context;
 using R3M.Finantial.Backend.Dtos;
 using R3M.Finantial.Backend.Model;
@@ -23,7 +22,6 @@ public class CategoriesController : ControllerBase
     public async Task<IActionResult> ListAsync()
     {
         var categories = await finantialContext.Categories
-            .Include(i => i.Children)
             .ToListAsync();
 
         return Ok(Convert(categories.Where(x => !x.ParentId.HasValue)));
@@ -32,15 +30,15 @@ public class CategoriesController : ControllerBase
     private static List<CategoryWithChildrenResponse> Convert(IEnumerable<Category> categories)
     {
         List<CategoryWithChildrenResponse> res = [];
-        foreach (var cat in categories)
-        {
-            res.Add(new CategoryWithChildrenResponse
-            {
-                Id = cat.Id,
-                Name = cat.Name,
-                Children = Convert(cat.Children.Where(x => x.ParentId.HasValue && x.ParentId.Value == cat.Id))
-            });
-        }
+        //foreach (var cat in categories)
+        //{
+        //    res.Add(new CategoryWithChildrenResponse
+        //    {
+        //        Id = cat.Id,
+        //        Name = cat.Name,
+        //        Children = Convert(cat.Children.Where(x => x.ParentId.HasValue && x.ParentId.Value == cat.Id))
+        //    });
+        //}
 
         return res;
     }

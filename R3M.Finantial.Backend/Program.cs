@@ -7,8 +7,7 @@ builder.Services.AddControllers();
 builder.Services.AddDbContext<FinantialContext>(options =>
 {
     options
-        .UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"))
-        .UseSnakeCaseNamingConvention();
+        .UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"), a => a.UseHierarchyId());
 });
 
 builder.Services.AddCors(options =>

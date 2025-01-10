@@ -30,12 +30,6 @@ public class FinantialContext : DbContext
 
             e.HasIndex(i => new { i.ParentId, i.Name })
                 .IsUnique(true);
-
-            e.HasOne(o => o.Parent)
-                .WithMany(m => m.Children)
-                .HasForeignKey(f => f.ParentId)
-                .IsRequired(false)
-                .OnDelete(DeleteBehavior.Restrict);
         });
 
         modelBuilder.Entity<Institution>(e =>

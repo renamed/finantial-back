@@ -2,8 +2,9 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
+using Microsoft.SqlServer.Types;
 using R3M.Finantial.Backend.Context;
 
 #nullable disable
@@ -18,196 +19,154 @@ namespace R3M.Finantial.Backend.Migrations
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("ProductVersion", "9.0.0")
-                .HasAnnotation("Relational:MaxIdentifierLength", 63);
+                .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
-            NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
+            SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
             modelBuilder.Entity("R3M.Finantial.Backend.Model.Category", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("id");
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("ChildrenCount")
+                        .HasColumnType("int");
+
+                    b.Property<SqlHierarchyId>("HierarchyId")
+                        .HasColumnType("hierarchyid");
 
                     b.Property<DateTime>("InsertedAtUtc")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("inserted_at_utc");
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(20)
-                        .HasColumnType("character varying(20)")
-                        .HasColumnName("name");
+                        .HasColumnType("nvarchar(20)");
 
                     b.Property<Guid?>("ParentId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("parent_id");
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime?>("UpdatedAtUtc")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("updated_at_utc");
+                        .HasColumnType("datetime2");
 
-                    b.HasKey("Id")
-                        .HasName("pk_categories");
+                    b.HasKey("Id");
 
                     b.HasIndex("ParentId", "Name")
                         .IsUnique()
-                        .HasDatabaseName("ix_categories_parent_id_name");
+                        .HasFilter("[ParentId] IS NOT NULL");
 
-                    b.ToTable("categories", (string)null);
+                    b.ToTable("Categories");
                 });
 
             modelBuilder.Entity("R3M.Finantial.Backend.Model.Institution", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("id");
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<decimal>("Balance")
-                        .HasColumnType("numeric")
-                        .HasColumnName("balance");
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<decimal>("InitialBalance")
-                        .HasColumnType("numeric")
-                        .HasColumnName("initial_balance");
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<DateOnly>("InitialBalanceDate")
-                        .HasColumnType("date")
-                        .HasColumnName("initial_balance_date");
+                        .HasColumnType("date");
 
                     b.Property<DateTime>("InsertedAtUtc")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("inserted_at_utc");
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(20)
-                        .HasColumnType("character varying(20)")
-                        .HasColumnName("name");
+                        .HasColumnType("nvarchar(20)");
 
                     b.Property<DateTime?>("UpdatedAtUtc")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("updated_at_utc");
+                        .HasColumnType("datetime2");
 
-                    b.HasKey("Id")
-                        .HasName("pk_institutions");
+                    b.HasKey("Id");
 
                     b.HasIndex("Name")
-                        .IsUnique()
-                        .HasDatabaseName("ix_institutions_name");
+                        .IsUnique();
 
-                    b.ToTable("institutions", (string)null);
+                    b.ToTable("Institutions");
                 });
 
             modelBuilder.Entity("R3M.Finantial.Backend.Model.Movimentation", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("id");
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid>("CategoryId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("category_id");
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<DateOnly>("Date")
-                        .HasColumnType("date")
-                        .HasColumnName("date");
+                        .HasColumnType("date");
 
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasMaxLength(30)
-                        .HasColumnType("character varying(30)")
-                        .HasColumnName("description");
+                        .HasColumnType("nvarchar(30)");
 
                     b.Property<DateTime>("InsertedAtUtc")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("inserted_at_utc");
+                        .HasColumnType("datetime2");
 
                     b.Property<Guid>("InstitutionId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("institution_id");
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid>("PeriodId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("period_id");
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime?>("UpdatedAtUtc")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("updated_at_utc");
+                        .HasColumnType("datetime2");
 
                     b.Property<decimal>("Value")
-                        .HasColumnType("numeric")
-                        .HasColumnName("value");
+                        .HasColumnType("decimal(18,2)");
 
-                    b.HasKey("Id")
-                        .HasName("pk_movimentations");
+                    b.HasKey("Id");
 
-                    b.HasIndex("CategoryId")
-                        .HasDatabaseName("ix_movimentations_category_id");
+                    b.HasIndex("CategoryId");
 
-                    b.HasIndex("InstitutionId")
-                        .HasDatabaseName("ix_movimentations_institution_id");
+                    b.HasIndex("InstitutionId");
 
-                    b.HasIndex("PeriodId")
-                        .HasDatabaseName("ix_movimentations_period_id");
+                    b.HasIndex("PeriodId");
 
-                    b.ToTable("movimentations", (string)null);
+                    b.ToTable("Movimentations");
                 });
 
             modelBuilder.Entity("R3M.Finantial.Backend.Model.Period", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("id");
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasMaxLength(6)
-                        .HasColumnType("character(6)")
-                        .HasColumnName("description")
+                        .HasColumnType("nchar(6)")
                         .IsFixedLength();
 
                     b.Property<DateOnly>("FinalDate")
-                        .HasColumnType("date")
-                        .HasColumnName("final_date");
+                        .HasColumnType("date");
 
                     b.Property<DateOnly>("InitialDate")
-                        .HasColumnType("date")
-                        .HasColumnName("initial_date");
+                        .HasColumnType("date");
 
                     b.Property<DateTime>("InsertedAtUtc")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("inserted_at_utc");
+                        .HasColumnType("datetime2");
 
                     b.Property<DateTime?>("UpdatedAtUtc")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("updated_at_utc");
+                        .HasColumnType("datetime2");
 
-                    b.HasKey("Id")
-                        .HasName("pk_periods");
+                    b.HasKey("Id");
 
                     b.HasIndex("Description")
-                        .IsUnique()
-                        .HasDatabaseName("ix_periods_description");
+                        .IsUnique();
 
-                    b.HasIndex("InitialDate", "FinalDate")
-                        .HasDatabaseName("ix_periods_initial_date_final_date");
+                    b.HasIndex("InitialDate", "FinalDate");
 
-                    b.ToTable("periods", (string)null);
-                });
-
-            modelBuilder.Entity("R3M.Finantial.Backend.Model.Category", b =>
-                {
-                    b.HasOne("R3M.Finantial.Backend.Model.Category", "Parent")
-                        .WithMany("Children")
-                        .HasForeignKey("ParentId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .HasConstraintName("fk_categories_categories_parent_id");
-
-                    b.Navigation("Parent");
+                    b.ToTable("Periods");
                 });
 
             modelBuilder.Entity("R3M.Finantial.Backend.Model.Movimentation", b =>
@@ -216,33 +175,25 @@ namespace R3M.Finantial.Backend.Migrations
                         .WithMany()
                         .HasForeignKey("CategoryId")
                         .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired()
-                        .HasConstraintName("fk_movimentations_categories_category_id");
+                        .IsRequired();
 
                     b.HasOne("R3M.Finantial.Backend.Model.Institution", "Institution")
                         .WithMany()
                         .HasForeignKey("InstitutionId")
                         .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired()
-                        .HasConstraintName("fk_movimentations_institutions_institution_id");
+                        .IsRequired();
 
                     b.HasOne("R3M.Finantial.Backend.Model.Period", "Period")
                         .WithMany()
                         .HasForeignKey("PeriodId")
                         .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired()
-                        .HasConstraintName("fk_movimentations_periods_period_id");
+                        .IsRequired();
 
                     b.Navigation("Category");
 
                     b.Navigation("Institution");
 
                     b.Navigation("Period");
-                });
-
-            modelBuilder.Entity("R3M.Finantial.Backend.Model.Category", b =>
-                {
-                    b.Navigation("Children");
                 });
 #pragma warning restore 612, 618
         }
